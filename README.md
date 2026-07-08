@@ -67,7 +67,7 @@ see the in-notebook instructions for launching via Colab's built-in
 
 ## Links
 
-- **GitHub Repository:** [add your repository link here after uploading — see `GITHUB_UPLOAD_GUIDE.md`]
+- **GitHub Repository:** https://github.com/Avneet-kaur98/cardiac-risk-assessment
 - **Live Deployment Link:** Not permanently deployed. The project is demoed
   live via a temporary Google Colab link (see notebook), since it's an
   educational project rather than a production deployment.
