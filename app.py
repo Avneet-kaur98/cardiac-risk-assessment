@@ -2,6 +2,9 @@ import json
 from flask import Flask, render_template, request
 import joblib
 import pandas as pd
+import os
+
+BASE_DIR = os.path.dirname(os.path.abspath(__file__))
 
 app = Flask(__name__)
 
@@ -11,11 +14,13 @@ insights = None
 load_error = None
 
 try:
-    model = joblib.load("model_pipeline.pkl")
-    with open("feature_info.json") as f:
-        feature_info = json.load(f)
-    with open("insights.json") as f:
-        insights = json.load(f)
+    model = joblib.load(os.path.join(BASE_DIR, "model_pipeline.pkl"))
+
+with open(os.path.join(BASE_DIR, "feature_info.json")) as f:
+    feature_info = json.load(f)
+
+with open(os.path.join(BASE_DIR, "insights.json")) as f:
+    insights = json.load(f)
 except Exception as exc:
     load_error = str(exc)
 
