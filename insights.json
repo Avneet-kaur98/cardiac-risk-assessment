@@ -1,0 +1,101 @@
+{
+  "model_name": "Logistic Regression",
+  "model_comparison": [
+    {
+      "model": "Logistic Regression",
+      "accuracy": 0.87,
+      "roc_auc": 0.914
+    },
+    {
+      "model": "Random Forest",
+      "accuracy": 0.833,
+      "roc_auc": 0.883
+    },
+    {
+      "model": "Gradient Boosting",
+      "accuracy": 0.815,
+      "roc_auc": 0.867
+    }
+  ],
+  "global_importance": [
+    {
+      "feature": "number_of_major_vessels",
+      "importance": 0.2414328744453519
+    },
+    {
+      "feature": "chest",
+      "importance": 0.18933371453025885
+    },
+    {
+      "feature": "sex",
+      "importance": 0.1307126884032058
+    },
+    {
+      "feature": "thal",
+      "importance": 0.10747283184082666
+    },
+    {
+      "feature": "slope",
+      "importance": 0.10510834549671612
+    },
+    {
+      "feature": "exercise_induced_angina",
+      "importance": 0.053100042226236085
+    },
+    {
+      "feature": "fasting_blood_sugar",
+      "importance": 0.046942716792038514
+    },
+    {
+      "feature": "resting_blood_pressure",
+      "importance": 0.02914353491576966
+    },
+    {
+      "feature": "oldpeak",
+      "importance": 0.029066234442070377
+    },
+    {
+      "feature": "maximum_heart_rate_achieved",
+      "importance": 0.024140672690880407
+    },
+    {
+      "feature": "serum_cholestoral",
+      "importance": 0.02246367064327586
+    },
+    {
+      "feature": "resting_electrocardiographic_results",
+      "importance": 0.021048210018503044
+    },
+    {
+      "feature": "age",
+      "importance": 3.446355486672877e-05
+    }
+  ],
+  "numeric_stats": {
+    "age": {
+      "mean": 54.43333333333333,
+      "std": 9.109066523898203,
+      "importance": 3.446355486672877e-05
+    },
+    "resting_blood_pressure": {
+      "mean": 131.34444444444443,
+      "std": 17.861608292800856,
+      "importance": 0.02914353491576966
+    },
+    "serum_cholestoral": {
+      "mean": 249.65925925925927,
+      "std": 51.68623711643128,
+      "importance": 0.02246367064327586
+    },
+    "maximum_heart_rate_achieved": {
+      "mean": 149.67777777777778,
+      "std": 23.16571677512009,
+      "importance": 0.024140672690880407
+    },
+    "oldpeak": {
+      "mean": 1.05,
+      "std": 1.1452098393779975,
+      "importance": 0.029066234442070377
+    }
+  }
+}
