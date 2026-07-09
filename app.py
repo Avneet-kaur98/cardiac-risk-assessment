@@ -1,8 +1,8 @@
 import json
+import os
 from flask import Flask, render_template, request
 import joblib
 import pandas as pd
-import os
 
 BASE_DIR = os.path.dirname(os.path.abspath(__file__))
 
@@ -15,12 +15,10 @@ load_error = None
 
 try:
     model = joblib.load(os.path.join(BASE_DIR, "model_pipeline.pkl"))
-
-with open(os.path.join(BASE_DIR, "feature_info.json")) as f:
-    feature_info = json.load(f)
-
-with open(os.path.join(BASE_DIR, "insights.json")) as f:
-    insights = json.load(f)
+    with open(os.path.join(BASE_DIR, "feature_info.json")) as f:
+        feature_info = json.load(f)
+    with open(os.path.join(BASE_DIR, "insights.json")) as f:
+        insights = json.load(f)
 except Exception as exc:
     load_error = str(exc)
 
@@ -110,4 +108,5 @@ def predict():
 
 
 if __name__ == "__main__":
-    app.run(host="0.0.0.0", port=5000)
+    port = int(os.environ.get("PORT", 5000))
+    app.run(host="0.0.0.0", port=port)
