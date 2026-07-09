@@ -1,0 +1,58 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<title>Predict Apple Quality</title>
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link href="https://fonts.googleapis.com/css2?family=Fraunces:opsz,wght@9..144,600;9..144,700&family=Inter:wght@400;500;600;700&family=IBM+Plex+Mono:wght@400;500&display=swap" rel="stylesheet">
+<link rel="stylesheet" href="{{ url_for('static', filename='style.css') }}">
+</head>
+<body>
+
+<nav>
+  <div class="brand">Apple<em>Quality</em></div>
+  <div>
+    <a href="/">Dashboard</a>
+    <a href="/predict" class="active">Predict</a>
+  </div>
+</nav>
+
+<div class="page-hero">
+  <h1>Predict Apple Quality</h1>
+  <p>Enter an apple's measured attributes below to get a live Good/Bad prediction from the trained model.</p>
+</div>
+
+<div class="section">
+  <div class="form-card">
+    <p class="hint">Values are standardized (z-scores) — typical range is roughly -4 to +4. Try 2 for a high value or -2 for a low value on any attribute.</p>
+    <form method="POST" action="/predict">
+      <div class="form-grid">
+        {% for feat in features %}
+        <div class="field">
+          <label for="{{ feat }}">{{ feat }}</label>
+          <input type="number" step="any" name="{{ feat }}" id="{{ feat }}"
+                 value="{{ input_values[feat] }}" placeholder="e.g. 0.5" required>
+        </div>
+        {% endfor %}
+      </div>
+      <button type="submit" class="submit-btn">Predict Quality</button>
+    </form>
+
+    {% if prediction and prediction != "Error" %}
+    <div class="result-card {{ 'result-good' if prediction == 'Good' else 'result-bad' }}">
+      <div class="verdict">{{ prediction }} Apple {{ '✅' if prediction == 'Good' else '❌' }}</div>
+      <div class="conf">Model confidence: {{ confidence }}%</div>
+    </div>
+    {% elif prediction == "Error" %}
+    <div class="result-card result-bad">
+      <div class="verdict">Please enter valid numbers in every field.</div>
+    </div>
+    {% endif %}
+  </div>
+</div>
+
+<footer>Model: Logistic Regression trained on 4,000 cleaned apple records &nbsp;·&nbsp; ~74% test accuracy</footer>
+
+</body>
+</html>
