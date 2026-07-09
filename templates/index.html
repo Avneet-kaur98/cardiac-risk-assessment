@@ -1,0 +1,179 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Cardiac Risk Assessment</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link href="https://fonts.googleapis.com/css2?family=Fraunces:opsz,wght@9..144,400;9..144,600;9..144,700&family=IBM+Plex+Sans:wght@400;500;600&family=IBM+Plex+Mono:wght@500;600&display=swap" rel="stylesheet">
+<style>
+  :root{
+    --paper:#EEF3F1; --panel:#FFFFFF; --ink:#16262A; --slate:#5B6B6C;
+    --line:#CBD6D2; --steel:#3E6B6E; --risk-low:#2E7D6B; --risk-mid:#C99A3E; --risk-high:#C1443B;
+  }
+  *{ box-sizing:border-box; }
+  body{ margin:0; background:var(--paper); color:var(--ink); font-family:'IBM Plex Sans', sans-serif; -webkit-font-smoothing:antialiased; }
+  .page{ max-width:1140px; margin:0 auto; padding:48px 24px 80px; }
+  header.masthead{ margin-bottom:36px; border-bottom:1px solid var(--line); padding-bottom:24px; }
+  .eyebrow{ font-family:'IBM Plex Mono', monospace; font-size:12px; letter-spacing:0.14em; color:var(--steel); text-transform:uppercase; margin:0 0 10px; }
+  h1{ font-family:'Fraunces', serif; font-weight:600; font-size:clamp(28px, 4vw, 42px); margin:0; letter-spacing:-0.01em; }
+  .sub{ color:var(--slate); margin:10px 0 0; max-width:680px; line-height:1.5; font-size:15px; }
+  .layout{ display:grid; grid-template-columns:1.05fr 0.95fr; gap:24px; align-items:start; }
+  @media (max-width:860px){ .layout{ grid-template-columns:1fr; } }
+  .card{ background:var(--panel); border:1px solid var(--line); border-radius:6px; padding:28px; margin-bottom:24px; }
+  .card h2{ font-family:'Fraunces', serif; font-size:19px; font-weight:600; margin:0 0 6px; }
+  .card .card-note{ font-size:13px; color:var(--slate); margin:0 0 20px; line-height:1.5; }
+  .field-grid{ display:grid; grid-template-columns:1fr 1fr; gap:16px 18px; }
+  .field{ display:flex; flex-direction:column; gap:6px; }
+  .field label{ font-size:12.5px; color:var(--slate); text-transform:capitalize; }
+  .field input, .field select{ font-family:'IBM Plex Mono', monospace; font-size:14px; padding:9px 10px; border:1px solid var(--line); border-radius:4px; background:#FBFDFC; color:var(--ink); }
+  .field input:focus, .field select:focus{ outline:2px solid var(--steel); outline-offset:1px; }
+  .submit-row{ margin-top:24px; display:flex; align-items:center; gap:14px; flex-wrap:wrap; }
+  button.run{ font-family:'IBM Plex Mono', monospace; font-size:13px; letter-spacing:0.04em; text-transform:uppercase; background:var(--ink); color:var(--paper); border:none; padding:13px 22px; border-radius:4px; cursor:pointer; }
+  button.run:hover{ background:var(--steel); }
+  .hint{ font-size:12.5px; color:var(--slate); }
+  .result-card{ position:sticky; top:24px; }
+  .gauge-wrap{ display:flex; flex-direction:column; align-items:center; padding-top:6px; }
+  .readout{ font-family:'IBM Plex Mono', monospace; text-align:center; margin-top:6px; }
+  .readout .pct{ font-size:40px; font-weight:600; line-height:1; }
+  .readout .tag{ font-size:12px; letter-spacing:0.1em; text-transform:uppercase; color:var(--slate); margin-top:6px; }
+  .badge{ display:inline-block; margin-top:14px; padding:6px 14px; border-radius:999px; font-family:'IBM Plex Mono', monospace; font-size:12.5px; letter-spacing:0.04em; }
+  .badge.low{ background:rgba(46,125,107,0.12); color:var(--risk-low); }
+  .badge.high{ background:rgba(193,68,59,0.12); color:var(--risk-high); }
+  .placeholder{ color:var(--slate); font-size:14px; line-height:1.6; text-align:center; padding:30px 10px 10px; }
+  .error-box{ background:rgba(193,68,59,0.08); border:1px solid rgba(193,68,59,0.3); color:var(--risk-high); padding:14px 16px; border-radius:4px; font-size:13.5px; margin-bottom:20px; }
+  .bar-row{ display:grid; grid-template-columns:150px 1fr 48px; align-items:center; gap:10px; margin-bottom:10px; }
+  .bar-row .bar-label{ font-size:12.5px; color:var(--ink); text-transform:capitalize; }
+  .bar-track{ background:#EAF0EE; border-radius:4px; height:9px; overflow:hidden; }
+  .bar-fill{ height:100%; border-radius:4px; background:var(--steel); }
+  .bar-fill.up{ background:var(--risk-high); }
+  .bar-fill.down{ background:var(--risk-low); }
+  .bar-value{ font-family:'IBM Plex Mono', monospace; font-size:11.5px; color:var(--slate); text-align:right; }
+  .factor-note{ font-size:12.5px; color:var(--slate); margin-top:2px; }
+  .comparison-row{ display:flex; justify-content:space-between; font-family:'IBM Plex Mono', monospace; font-size:12.5px; padding:6px 0; border-bottom:1px dashed var(--line); }
+  .comparison-row:last-child{ border-bottom:none; }
+  .comparison-row .best{ color:var(--steel); font-weight:600; }
+  .disclaimer{ margin-top:8px; font-size:12.5px; color:var(--slate); border-top:1px solid var(--line); padding-top:18px; line-height:1.6; }
+</style>
+</head>
+<body>
+<div class="page">
+  <header class="masthead">
+    <p class="eyebrow">Clinical Decision Support &middot</p>
+    <h1>Cardiac Risk Assessment</h1>
+    <p class="sub">Enter a patient's vitals to estimate heart disease risk.</p>
+  </header>
+
+  {% if load_error %}
+    <div class="error-box">Model files not found. Detail: {{ load_error }}</div>
+  {% endif %}
+
+  <div class="layout">
+    <div>
+      <section class="card">
+        <h2>Patient Vitals</h2>
+        <p class="card-note">Fields are pre-filled with typical values — adjust and re-run anytime.</p>
+        <form method="POST" action="/predict">
+          <div class="field-grid">
+            {% for feat in features %}
+              <div class="field">
+                <label for="{{ feat.name }}">{{ feat.name.replace('_', ' ') }}</label>
+                {% if feat.type == 'numeric' %}
+                  <input type="number" step="any" id="{{ feat.name }}" name="{{ feat.name }}"
+                    min="{{ feat.min }}" max="{{ feat.max }}"
+                    value="{{ submitted.get(feat.name, feat.default) }}" required>
+                {% else %}
+                  <select id="{{ feat.name }}" name="{{ feat.name }}">
+                    {% for opt in feat.options %}
+                      <option value="{{ opt }}" {% if submitted.get(feat.name, feat.default)|string == opt|string %}selected{% endif %}>{{ opt }}</option>
+                    {% endfor %}
+                  </select>
+                {% endif %}
+              </div>
+            {% endfor %}
+          </div>
+          <div class="submit-row">
+            <button class="run" type="submit">Assess risk</button>
+            <span class="hint">Model used: {{ insights.model_name if insights else '—' }}</span>
+          </div>
+        </form>
+      </section>
+
+      {% if insights %}
+      <section class="card">
+        <h2>Model Comparison</h2>
+        <p class="card-note">Three models were trained and evaluated by ROC-AUC before picking the best one.</p>
+        {% for row in insights.model_comparison %}
+          <div class="comparison-row">
+            <span class="{{ 'best' if row.model == insights.model_name else '' }}">{{ row.model }}{% if row.model == insights.model_name %} (selected){% endif %}</span>
+            <span>accuracy {{ row.accuracy }} &nbsp;·&nbsp; ROC-AUC {{ row.roc_auc }}</span>
+          </div>
+        {% endfor %}
+      </section>
+
+      <section class="card">
+        <h2>What Drives the Model, Overall</h2>
+        <p class="card-note">Global feature importance from the trained model.</p>
+        {% for feat in insights.global_importance[:6] %}
+          <div class="bar-row">
+            <span class="bar-label">{{ feat.feature.replace('_',' ') }}</span>
+            <div class="bar-track"><div class="bar-fill" style="width: {{ (feat.importance * 100) | round(1) }}%;"></div></div>
+            <span class="bar-value">{{ (feat.importance * 100) | round(1) }}%</span>
+          </div>
+        {% endfor %}
+      </section>
+      {% endif %}
+    </div>
+
+    <section class="card result-card">
+      <h2>Risk Assessment</h2>
+      {% if result and result.error %}
+        <div class="error-box">{{ result.error }}</div>
+      {% elif result %}
+        <div class="gauge-wrap">
+          <svg id="gauge" viewBox="0 0 220 130" width="220" height="130">
+            <path d="M 20 110 A 90 90 0 0 1 82 24" fill="none" stroke="#2E7D6B" stroke-width="14" stroke-linecap="round"/>
+            <path d="M 82 24 A 90 90 0 0 1 138 24" fill="none" stroke="#C99A3E" stroke-width="14" stroke-linecap="round"/>
+            <path d="M 138 24 A 90 90 0 0 1 200 110" fill="none" stroke="#C1443B" stroke-width="14" stroke-linecap="round"/>
+            <line id="needle" x1="110" y1="110" x2="110" y2="30" stroke="#16262A" stroke-width="3" stroke-linecap="round" transform="rotate(0 110 110)"/>
+            <circle cx="110" cy="110" r="6" fill="#16262A"/>
+          </svg>
+          <div class="readout">
+            <div class="pct" style="color: {{ '#C1443B' if result.is_high_risk else '#2E7D6B' }};">{{ result.probability }}%</div>
+            <div class="tag">Estimated risk score</div>
+          </div>
+          <span class="badge {{ 'high' if result.is_high_risk else 'low' }}">{{ result.label }}</span>
+        </div>
+        {% if result.top_factors %}
+        <div style="margin-top:26px; padding-top:20px; border-top:1px solid var(--line);">
+          <h2 style="font-size:16px;">Top Factors For This Patient</h2>
+          <p class="factor-note" style="margin-bottom:14px;">How far this patient's values sit from the dataset average, weighted by feature importance.</p>
+          {% for f in result.top_factors %}
+            <div class="bar-row">
+              <span class="bar-label">{{ f.feature.replace('_',' ') }}</span>
+              <div class="bar-track"><div class="bar-fill {{ f.direction }}" style="width: {{ f.bar_pct }}%;"></div></div>
+              <span class="bar-value">{{ 'risk ↑' if f.direction == 'up' else 'risk ↓' }}</span>
+            </div>
+          {% endfor %}
+        </div>
+        {% endif %}
+        <script>
+          (function(){
+            var probability = {{ result.probability }};
+            var angle = -90 + (probability / 100) * 180;
+            var needle = document.getElementById('needle');
+            needle.style.transition = 'transform 900ms cubic-bezier(0.2, 0.8, 0.2, 1)';
+            requestAnimationFrame(function(){
+              needle.setAttribute('transform', 'rotate(' + angle + ' 110 110)');
+            });
+          })();
+        </script>
+      {% else %}
+        <div class="placeholder">Fill in the vitals on the left and click <strong>Assess risk</strong>.</div>
+      {% endif %}
+      <p class="disclaimer">Educational demo only — not a medical device and not a substitute for professional diagnosis.</p>
+    </section>
+  </div>
+</div>
+</body>
+</html>
